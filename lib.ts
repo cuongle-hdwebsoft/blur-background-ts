@@ -45,7 +45,7 @@ export const createImageSegmenter = async () => {
 
 export const handleSegmentData = (
   result: ImageSegmenterResult,
-  img: HTMLImageElement,
+  image: HTMLImageElement,
   canvas: HTMLCanvasElement,
   backgroundCanvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
@@ -57,23 +57,17 @@ export const handleSegmentData = (
 
   // Person data
   const imageData = ctx.getImageData(0, 0, width, height).data;
-  console.log("imageData", imageData);
+
   // Background data
   const segmentationMask = ctxBackground.getImageData(0, 0, width, height).data;
 
   // Clone data from original image
-  var cloneCanvas = <HTMLCanvasElement>document.createElement("canvas");
-  var cloneContext = <CanvasRenderingContext2D>canvas.getContext("2d", { willReadFrequently: true });
+  const cloneCanvas = <HTMLCanvasElement>document.createElement("canvas");
+  const cloneContext = <CanvasRenderingContext2D>cloneCanvas.getContext("2d", { willReadFrequently: true });
   cloneCanvas.width = width;
   cloneCanvas.height = width;
-  cloneContext.drawImage(img, 0, 0);
-  var cloneImageData = cloneContext.getImageData(0, 0, width, height).data;
-
-  canvas.width = width;
-  canvas.height = height;
-
-  backgroundCanvas.width = width;
-  backgroundCanvas.height = height;
+  cloneContext.drawImage(image, 0, 0, width, height);
+  const cloneImageData = cloneContext.getImageData(0, 0, width, height).data;
 
   // 1 mask -> r,b,g,a -> 1 pixel -> class in original image
   const mask = result.categoryMask.getAsUint8Array();
@@ -94,11 +88,6 @@ export const handleSegmentData = (
       imageData[i * 4 + 2] = g;
       imageData[i * 4 + 3] = a;
 
-      // segmentationMask[i * 4 + 0] = 255;
-      // segmentationMask[i * 4 + 1] = 255;
-      // segmentationMask[i * 4 + 2] = 255;
-      // segmentationMask[i * 4 + 3] = 0;
-
       continue;
     }
 
@@ -106,11 +95,6 @@ export const handleSegmentData = (
     segmentationMask[i * 4 + 1] = b;
     segmentationMask[i * 4 + 2] = g;
     segmentationMask[i * 4 + 3] = a;
-
-    // imageData[i * 4 + 0] = 255;
-    // imageData[i * 4 + 1] = 255;
-    // imageData[i * 4 + 2] = 255;
-    // imageData[i * 4 + 3] = 0;
   }
 
   console.table(obj);
@@ -141,6 +125,17 @@ export const imageCallback = (
 
   if (!result) throw new Error("ImageSegmenterResult does not exist");
 
+  if (!result.categoryMask) throw new Error("categoryMask does not exist");
+
+  backgroundCanvas.width = result.categoryMask.width;
+  backgroundCanvas.height = result.categoryMask.height;
+
+  // Set canvas width/ height to make `putImageData` can override full existing pixels from ImageData
+  // Otherwise, Althought we give it full ImageData but it actually does not use full of it.
+  // Please read the 7st in README
+  canvas.width = result.categoryMask.width; // same as image.natualWidth
+  canvas.height = result.categoryMask.height; // same as image.natualHeight
+
   const { imageData, segmentationMask, width, height } = handleSegmentData(
     result,
     image,
@@ -149,9 +144,6 @@ export const imageCallback = (
     ctx,
     ctxBackground
   );
-
-  console.log("canvas.width", canvas.width);
-  console.log("canvas.height", canvas.height);
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctxBackground.clearRect(0, 0, canvas.width, canvas.height);
@@ -190,8 +182,5 @@ export const imageCallback = (
 };
 
 export const handleEffectImage = (canvas: HTMLCanvasElement, image: HTMLImageElement, optionPayload: OptionPayload) => {
-  imageSegmenter.segment(image, (result) => {
-    imageCallback(result, canvas, image, optionPayload);
-    // imageCallback(result, canvas, image, optionPayload);
-  });
+  imageSegmenter.segment(image, (result) => imageCallback(result, canvas, image, optionPayload));
 };
