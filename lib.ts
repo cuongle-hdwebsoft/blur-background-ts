@@ -46,8 +46,6 @@ export const createImageSegmenter = async () => {
 export const handleSegmentData = (
   result: ImageSegmenterResult,
   image: HTMLImageElement,
-  canvas: HTMLCanvasElement,
-  backgroundCanvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
   ctxBackground: CanvasRenderingContext2D
 ) => {
@@ -136,14 +134,7 @@ export const imageCallback = (
   canvas.width = result.categoryMask.width; // same as image.natualWidth
   canvas.height = result.categoryMask.height; // same as image.natualHeight
 
-  const { imageData, segmentationMask, width, height } = handleSegmentData(
-    result,
-    image,
-    canvas,
-    backgroundCanvas,
-    ctx,
-    ctxBackground
-  );
+  const { imageData, segmentationMask, width, height } = handleSegmentData(result, image, ctx, ctxBackground);
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctxBackground.clearRect(0, 0, canvas.width, canvas.height);
