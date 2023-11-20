@@ -30,6 +30,8 @@ window.onload = async function () {
       originalImage.setAttribute("src", base64);
     }
 
+    webcamRunning = false;
+    enableWebcamButton!.innerText = "ENABLE SEGMENTATION";
     handleStopEffectVideo();
 
     canvas = <HTMLCanvasElement>document.getElementById("canvas");
