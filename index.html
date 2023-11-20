@@ -3,72 +3,109 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>image-segmentation-ts</title>
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Nabla&family=Roboto:wght@300;400;500;700;900&family=Ubuntu+Mono&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap");
 
       * {
-        font-family: Roboto;
+        font-family: "Ubuntu Mono", monospace;
+        box-sizing: border-box;
+      }
+
+      .container {
+        width: 50%;
+        margin: auto;
+        max-width: 700px;
+        min-width: 300px;
       }
 
       .relative {
         position: relative;
       }
 
+      .text-center {
+        text-align: center;
+      }
+
       video {
         width: 50%;
         object-fit: contain;
+        flex-shrink: 0;
       }
 
       img {
-        width: 25%;
+        width: 100%;
       }
 
       canvas {
         border: 1px solid #ddd;
+        width: 100%;
+        margin: auto;
+        flex-shrink: 0;
+      }
+
+      #result {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #result > div {
         width: 50%;
+      }
+
+      .item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
       }
     </style>
   </head>
   <body>
-    <div>
+    <div class="container">
       <div class="relative">
-        <h2>Original image</h2>
+        <h2 class="text-center">Original image</h2>
         <img id="image" src="./imgs/IMG_0158 2 Large.jpeg" alt="" crossorigin="anonymous" />
       </div>
 
       <div id="result">
-        <h2>Result</h2>
-        <div>
-          <h3>Blur background</h3>
+        <div class="item">
+          <h3 class="text-center">Blur background</h3>
           <canvas id="canvas"></canvas>
-          <div><button id="blur-btn">apply</button></div>
         </div>
 
-        <div>
-          <h3>Change background to new color</h3>
+        <div class="item">
+          <h3 class="text-center">Change background to new color</h3>
           <canvas id="canvas-bg-color"></canvas>
-          <div><button id="bg-color-btn">apply</button></div>
         </div>
 
-        <div>
-          <h3>Crop background image</h3>
+        <div class="item">
+          <h3 class="text-center">Crop background image</h3>
           <canvas id="canvas-crop"></canvas>
-          <div><button id="crop-btn">apply</button></div>
         </div>
 
-        <div>
-          <h3>Change background to image</h3>
+        <div class="item">
+          <h3 class="text-center">Change background to image</h3>
           <canvas id="canvas-img"></canvas>
-          <img id="bg-img" src="./imgs/d80e3cbbd11095103a2eb8ae88eeb1bb.jpg" alt="" />
-          <div><button id="img-btn">apply</button></div>
+          <img style="display: none" id="bg-img" src="./imgs/d80e3cbbd11095103a2eb8ae88eeb1bb.jpg" alt="" />
         </div>
       </div>
-    </div>
 
-    <button id="enableWebcamButton">ENABLE SEGMENTATION</button>
-    <video autoplay muted playsinline width="300" height="150"></video>
-    <canvas id="canvas-video"></canvas>
+      <div class="item">
+        <h3 class="text-center">Blur webcam</h3>
+        <video
+          style="visibility: hidden; position: absolute"
+          autoplay
+          muted
+          playsinline
+          width="300"
+          height="150"
+        ></video>
+        <canvas width="300" height="150" id="canvas-video"></canvas>
+        <div><button style="margin-top: 5px" id="enableWebcamButton">ENABLE SEGMENTATION</button></div>
+      </div>
+    </div>
 
     <script src="./index.ts" type="module"></script>
   </body>
