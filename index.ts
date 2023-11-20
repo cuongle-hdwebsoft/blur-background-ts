@@ -1,4 +1,4 @@
-import { TYPE, createImageSegmenter, handleEffectImage } from "./lib";
+import { TYPE, createImageSegmenter, handleEffectImage } from "./lib/image";
 
 window.onload = function () {
   createImageSegmenter().then(() => {

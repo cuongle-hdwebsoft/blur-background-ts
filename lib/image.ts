@@ -1,10 +1,9 @@
 import { ImageSegmenter, FilesetResolver, ImageSegmenterResult } from "@mediapipe/tasks-vision";
-import scaleImageToFitCanvas from "./utils/scale-image-to-fit-canvas";
+import scaleImageToFitCanvas from "../utils/scale-image-to-fit-canvas";
 
 let imageSegmenter: ImageSegmenter;
 let labels: string[] = [];
 const runningMode = "IMAGE";
-// const MODEL_ASSET_PATH = "/app/shared/models/deeplab_v3.tflite";
 const WASM_PATH = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm";
 const MODEL_ASSET_PATH = "https://storage.googleapis.com/mediapipe-assets/deeplabv3.tflite?generation=1661875711618421";
 
