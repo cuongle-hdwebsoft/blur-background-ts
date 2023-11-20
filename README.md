@@ -1,24 +1,60 @@
 # image-segmentation-ts
 
-## Demo
+## Result example
 
 ### Blur
+
+- `handleEffectImage(canvas, image, { type: TYPE.BLUR })`
 
 ![alt](./docs/blur.png)
 
 ### Change background color
 
+- `handleEffectImage(canvas, image, { type: TYPE.BG_COLOR, color: "blue" });`
+
 ![alt](./docs/bg-color.png)
 
 ### Crop only person
+
+- `handleEffectImage(canvas, image, { type: TYPE.CROP });`
 
 ![alt](./docs/crop-background.png)
 
 ### Change background to new image
 
+- `handleEffectImage(canvas, image, { type: TYPE.IMAGE, imgSrc: bgImg });`
+
 ![alt](./docs/bg-img.png)
 
 [Here is the image that I used](https://www.freepik.com/free-photo/woman-with-headset-having-video-call-laptop_12457231.htm#page=3&query=person%20zoom&position=24&from_view=search&track=ais&uuid=bba742d7-d9ff-4ced-8327-6cc9f1f65924)
+
+## Getting started
+
+- Init segmentation
+
+```
+import { imageSegmenter, init, handleEffectVideo, handleEffectImage } from "./lib/index";
+
+await init();
+```
+
+- Blur background image
+
+```
+const image = <HTMLImageElement>document.getElementById("image");
+canvas = <HTMLCanvasElement>document.getElementById("canvas");
+handleEffectImage(canvas, image, { type: TYPE.BLUR });
+```
+
+- Blur webcam background
+
+```
+const video = <HTMLVideoElement>document.querySelector("video");
+const canvas = <HTMLCanvasElement>document.getElementById("canvas-video");
+
+video.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
+video.addEventListener("loadeddata", () => handleEffectVideo(canvas, video));
+```
 
 ## Requirement
 
@@ -29,8 +65,9 @@ node 18
 ## Development
 
 ```
-git clone ...
+git clone https://github.com/cuongle-hdwebsoft/image-segmentation-ts
 npm i
+nvm use
 npm start
 ```
 
