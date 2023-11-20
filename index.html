@@ -50,7 +50,13 @@
       }
 
       #result > div {
-        width: 50%;
+        width: 100%;
+      }
+
+      @media only screen and (min-width: 768px) {
+        #result > div {
+          width: 50%;
+        }
       }
 
       .item {
@@ -67,6 +73,7 @@
       <div class="relative">
         <h2 class="text-center">Original image</h2>
         <img id="image" src="./imgs/IMG_0158 2 Large.jpeg" alt="" crossorigin="anonymous" />
+        <input accept="image/*" type="file" />
       </div>
 
       <div id="result">
@@ -103,7 +110,7 @@
           height="150"
         ></video>
         <canvas width="300" height="150" id="canvas-video"></canvas>
-        <div><button style="margin-top: 5px" id="enableWebcamButton">ENABLE SEGMENTATION</button></div>
+        <div><button type="button" style="margin-top: 5px" id="enableWebcamButton">ENABLE SEGMENTATION</button></div>
       </div>
     </div>
 

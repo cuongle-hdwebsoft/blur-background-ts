@@ -1,4 +1,4 @@
-import { ImageSegmenter, ImageSegmenterResult } from "@mediapipe/tasks-vision";
+import { ImageSegmenterResult } from "@mediapipe/tasks-vision";
 import { imageSegmenter } from "./index.ts";
 
 let canvas: HTMLCanvasElement;
@@ -8,6 +8,7 @@ let backgroundCtx: CanvasRenderingContext2D | null;
 let video: HTMLVideoElement;
 let videoWidth: number; // same as natualWidth
 let videoHeight: number; // same as naturalHeight
+let isRunning = false;
 
 function callbackForVideo(result: ImageSegmenterResult) {
   if (!video || !canvasCtx || !result || !result.categoryMask) return;
@@ -111,7 +112,7 @@ function callbackForVideo(result: ImageSegmenterResult) {
 
 let lastWebcamTime = -1;
 const predictWebcam = () => {
-  if (!video || !canvasCtx || imageSegmenter === undefined) return;
+  if (!video || !canvasCtx || imageSegmenter === undefined || !isRunning) return;
 
   if (video.currentTime === lastWebcamTime) {
     window.requestAnimationFrame(predictWebcam);
@@ -135,5 +136,14 @@ export const handleEffectVideo = (externalCanvas: HTMLCanvasElement, externalVid
   videoWidth = video.videoWidth;
   videoHeight = video.videoHeight;
 
+  imageSegmenter.setOptions({
+    runningMode: "VIDEO",
+  });
+  isRunning = true;
+
   predictWebcam();
+};
+
+export const handleStopEffectVideo = () => {
+  isRunning = false;
 };

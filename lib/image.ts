@@ -172,6 +172,13 @@ export const imageCallback = (
   ctx.restore();
 };
 
-export const handleEffectImage = (canvas: HTMLCanvasElement, image: HTMLImageElement, optionPayload: OptionPayload) => {
+export const handleEffectImage = async (
+  canvas: HTMLCanvasElement,
+  image: HTMLImageElement,
+  optionPayload: OptionPayload
+) => {
+  await imageSegmenter.setOptions({
+    runningMode: "IMAGE",
+  });
   imageSegmenter.segment(image, (result) => imageCallback(result, canvas, image, optionPayload));
 };

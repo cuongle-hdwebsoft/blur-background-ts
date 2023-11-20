@@ -1,6 +1,6 @@
 import { ImageSegmenter } from "@mediapipe/tasks-vision";
 import { createImageSegmenter, handleEffectImage } from "./image";
-import { handleEffectVideo } from "./video";
+import { handleEffectVideo, handleStopEffectVideo } from "./video";
 
 export let imageSegmenter: ImageSegmenter;
 
@@ -13,4 +13,4 @@ export const destroy = () => {
   imageSegmenter.close();
 };
 
-export { handleEffectVideo, handleEffectImage };
+export { handleEffectVideo, handleEffectImage, handleStopEffectVideo };
