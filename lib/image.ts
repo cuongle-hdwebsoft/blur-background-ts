@@ -1,7 +1,7 @@
+import { imageSegmenter } from "./index";
 import { ImageSegmenter, FilesetResolver, ImageSegmenterResult } from "@mediapipe/tasks-vision";
 import scaleImageToFitCanvas from "../utils/scale-image-to-fit-canvas";
 
-let imageSegmenter: ImageSegmenter;
 let labels: string[] = [];
 const runningMode = "IMAGE";
 const WASM_PATH = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm";
@@ -24,7 +24,7 @@ export type OptionPayload =
 export const createImageSegmenter = async () => {
   const vision = await FilesetResolver.forVisionTasks(WASM_PATH);
 
-  imageSegmenter = await ImageSegmenter.createFromOptions(vision, {
+  const internalImageSegmenter = await ImageSegmenter.createFromOptions(vision, {
     baseOptions: {
       modelAssetPath: MODEL_ASSET_PATH,
       delegate: "GPU",
@@ -35,11 +35,12 @@ export const createImageSegmenter = async () => {
   });
 
   // Get all object in image
-  labels = imageSegmenter.getLabels();
+  labels = internalImageSegmenter.getLabels();
 
+  console.log("labels", labels);
   console.log("Ready to test...");
 
-  return imageSegmenter;
+  return internalImageSegmenter;
 };
 
 export const handleSegmentData = (
