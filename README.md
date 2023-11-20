@@ -60,3 +60,7 @@ npm start
 [7. The CanvasRenderingContext2D.putImageData() method of the Canvas 2D API paints data from the given ImageData object onto the canvas. If a dirty rectangle is provided, only the pixels from that rectangle are painted. This method is not affected by the canvas transformation matrix.]()
 
 [8. CanvasRenderingContext2D: putImageData() method](https://developer.mozilla.org/en-US/docs/Web/API/ImageData)
+
+## Reference
+
+[https://github.com/akhil-rana/virtual-bg](https://github.com/akhil-rana/virtual-bg)

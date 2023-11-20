@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>image-segmentation-ts</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap");
+
+      * {
+        font-family: "Ubuntu Mono", monospace;
+        box-sizing: border-box;
+      }
+
+      .container {
+        width: 50%;
+        margin: auto;
+        max-width: 700px;
+        min-width: 300px;
+      }
+
+      .relative {
+        position: relative;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      video {
+        width: 50%;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+
+      img {
+        width: 100%;
+      }
+
+      canvas {
+        border: 1px solid #ddd;
+        width: 100%;
+        margin: auto;
+        flex-shrink: 0;
+      }
+
+      #result {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #result > div {
+        width: 50%;
+      }
+
+      .item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-3nMSLH67.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="relative">
+        <h2 class="text-center">Original image</h2>
+        <img id="image" src="/assets/IMG_0158 2 Large-H9X5x14x.jpeg" alt="" crossorigin="anonymous" />
+      </div>
+
+      <div id="result">
+        <div class="item">
+          <h3 class="text-center">Blur background</h3>
+          <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="item">
+          <h3 class="text-center">Change background to new color</h3>
+          <canvas id="canvas-bg-color"></canvas>
+        </div>
+
+        <div class="item">
+          <h3 class="text-center">Crop background image</h3>
+          <canvas id="canvas-crop"></canvas>
+        </div>
+
+        <div class="item">
+          <h3 class="text-center">Change background to image</h3>
+          <canvas id="canvas-img"></canvas>
+          <img style="display: none" id="bg-img" src="/assets/d80e3cbbd11095103a2eb8ae88eeb1bb-5WZGnUnN.jpg" alt="" />
+        </div>
+      </div>
+
+      <div class="item">
+        <h3 class="text-center">Blur webcam</h3>
+        <video
+          style="visibility: hidden; position: absolute"
+          autoplay
+          muted
+          playsinline
+          width="300"
+          height="150"
+        ></video>
+        <canvas width="300" height="150" id="canvas-video"></canvas>
+        <div><button style="margin-top: 5px" id="enableWebcamButton">ENABLE SEGMENTATION</button></div>
+      </div>
+    </div>
+
+  </body>
+</html>
