@@ -95,8 +95,6 @@ export const handleSegmentData = (
     segmentationMask[i * 4 + 3] = a;
   }
 
-  console.table(obj);
-
   return {
     segmentationMask,
     imageData,
@@ -107,10 +105,11 @@ export const handleSegmentData = (
 
 export const imageCallback = (
   result: ImageSegmenterResult,
-  canvas: HTMLCanvasElement,
   image: HTMLImageElement,
-  optionPayload: OptionPayload
+  optionPayload: OptionPayload,
+  callback: (result: { imageData: ImageData; width: number; height: number }) => void
 ) => {
+  const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
   // Create a canvas called background canvas
@@ -170,15 +169,18 @@ export const imageCallback = (
   }
 
   ctx.restore();
+
+  callback({ imageData: ctx.getImageData(0, 0, width, height, { colorSpace: "srgb" }), height, width });
 };
 
 export const handleEffectImage = async (
-  canvas: HTMLCanvasElement,
   image: HTMLImageElement,
-  optionPayload: OptionPayload
+  optionPayload: OptionPayload,
+  callback: (result: { imageData: ImageData; width: number; height: number }) => void
 ) => {
   await imageSegmenter.setOptions({
     runningMode: "IMAGE",
   });
-  imageSegmenter.segment(image, (result) => imageCallback(result, canvas, image, optionPayload));
+
+  imageSegmenter.segment(image, (result) => imageCallback(result, image, optionPayload, callback));
 };

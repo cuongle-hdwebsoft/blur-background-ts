@@ -34,36 +34,68 @@ window.onload = async function () {
     enableWebcamButton!.innerText = "ENABLE SEGMENTATION";
     handleStopEffectVideo();
 
-    canvas = <HTMLCanvasElement>document.getElementById("canvas");
-    handleEffectImage(canvas, imgEl, { type: TYPE.BLUR });
+    const canvas1 = <HTMLCanvasElement>document.getElementById("canvas");
+    handleEffectImage(image, { type: TYPE.BLUR }, ({ imageData, width, height }) => {
+      canvas1.width = width;
+      canvas1.height = height;
+      canvas1.getContext("2d")?.putImageData(imageData, 0, 0);
+    });
 
-    canvas = <HTMLCanvasElement>document.getElementById("canvas-bg-color");
-    handleEffectImage(canvas, imgEl, { type: TYPE.BG_COLOR, color: "blue" });
+    const canvas2 = <HTMLCanvasElement>document.getElementById("canvas-bg-color");
+    handleEffectImage(image, { type: TYPE.BG_COLOR, color: "blue" }, ({ imageData, width, height }) => {
+      canvas2.width = width;
+      canvas2.height = height;
+      canvas2.getContext("2d")?.putImageData(imageData, 0, 0);
+    });
 
-    canvas = <HTMLCanvasElement>document.getElementById("canvas-crop");
-    handleEffectImage(canvas, imgEl, { type: TYPE.CROP });
+    const canvas3 = <HTMLCanvasElement>document.getElementById("canvas-crop");
+    handleEffectImage(image, { type: TYPE.CROP }, ({ imageData, width, height }) => {
+      canvas3.width = width;
+      canvas3.height = height;
+      canvas3.getContext("2d")?.putImageData(imageData, 0, 0);
+    });
 
-    canvas = <HTMLCanvasElement>document.getElementById("canvas-img");
+    const canvas4 = <HTMLCanvasElement>document.getElementById("canvas-img");
     const bgImg = <HTMLImageElement>document.getElementById("bg-img");
-    handleEffectImage(canvas, imgEl, { type: TYPE.IMAGE, imgSrc: bgImg });
+    handleEffectImage(image, { type: TYPE.IMAGE, imgSrc: bgImg }, ({ imageData, width, height }) => {
+      canvas4.width = width;
+      canvas4.height = height;
+      canvas4.getContext("2d")?.putImageData(imageData, 0, 0);
+    });
   };
 
   // Create image segmenter
   await init();
 
   image = <HTMLImageElement>document.getElementById("image");
-  canvas = <HTMLCanvasElement>document.getElementById("canvas");
-  handleEffectImage(canvas, image, { type: TYPE.BLUR });
+  const canvas1 = <HTMLCanvasElement>document.getElementById("canvas");
+  handleEffectImage(image, { type: TYPE.BLUR }, ({ imageData, width, height }) => {
+    canvas1.width = width;
+    canvas1.height = height;
+    canvas1.getContext("2d")?.putImageData(imageData, 0, 0);
+  });
 
-  canvas = <HTMLCanvasElement>document.getElementById("canvas-bg-color");
-  handleEffectImage(canvas, image, { type: TYPE.BG_COLOR, color: "blue" });
+  const canvas2 = <HTMLCanvasElement>document.getElementById("canvas-bg-color");
+  handleEffectImage(image, { type: TYPE.BG_COLOR, color: "blue" }, ({ imageData, width, height }) => {
+    canvas2.width = width;
+    canvas2.height = height;
+    canvas2.getContext("2d")?.putImageData(imageData, 0, 0);
+  });
 
-  canvas = <HTMLCanvasElement>document.getElementById("canvas-crop");
-  handleEffectImage(canvas, image, { type: TYPE.CROP });
+  const canvas3 = <HTMLCanvasElement>document.getElementById("canvas-crop");
+  handleEffectImage(image, { type: TYPE.CROP }, ({ imageData, width, height }) => {
+    canvas3.width = width;
+    canvas3.height = height;
+    canvas3.getContext("2d")?.putImageData(imageData, 0, 0);
+  });
 
-  canvas = <HTMLCanvasElement>document.getElementById("canvas-img");
+  const canvas4 = <HTMLCanvasElement>document.getElementById("canvas-img");
   const bgImg = <HTMLImageElement>document.getElementById("bg-img");
-  handleEffectImage(canvas, image, { type: TYPE.IMAGE, imgSrc: bgImg });
+  handleEffectImage(image, { type: TYPE.IMAGE, imgSrc: bgImg }, ({ imageData, width, height }) => {
+    canvas4.width = width;
+    canvas4.height = height;
+    canvas4.getContext("2d")?.putImageData(imageData, 0, 0);
+  });
 
   const video = <HTMLVideoElement>document.querySelector("video");
 
