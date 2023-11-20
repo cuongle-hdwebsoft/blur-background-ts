@@ -8,5 +8,8 @@
     "@mediapipe/tasks-vision": "^0.10.8",
     "serve": "^14.2.1",
     "vite": "^5.0.0"
+  },
+  "engines": {
+    "node": ">= 18"
   }
 }

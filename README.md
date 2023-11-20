@@ -1,8 +1,11 @@
 # image-segmentation-ts
 
+- 🎆 Use latest [MediaPipe Solution](https://developers.google.com/mediapipe/solutions)
+- 🎉 Written in TypeScript
+
 ## Demo
 
-[Try our demo here](https://codesandbox.io/s/practical-browser-xz4g7j?file=/index.html)
+[Try demo here](https://codesandbox.io/s/practical-browser-xz4g7j?file=/index.html)
 
 ## Result example
 
@@ -96,3 +99,7 @@ npm run dev
 [8. CanvasRenderingContext2D: `putImageData()` method](https://developer.mozilla.org/en-US/docs/Web/API/ImageData)
 
 [9. What is difference between `@mediapipe/tasks-vision` and `@mediapipe/selfie_segmentation` on npm?](https://github.com/google/mediapipe/issues/4251#issuecomment-1502232632)
+
+## Contact
+
+Contact to me through email <cuong.leminh@hdwebsoft.dev> or create [an issue](https://github.com/cuongle-hdwebsoft/image-segmentation-ts/issues).
