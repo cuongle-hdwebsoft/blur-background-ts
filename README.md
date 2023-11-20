@@ -72,7 +72,7 @@ node 18
 git clone https://github.com/cuongle-hdwebsoft/image-segmentation-ts
 npm i
 nvm use
-npm start
+npm run dev
 ```
 
 ## QA
