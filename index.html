@@ -17,6 +17,7 @@
 
       video {
         object-fit: contain;
+        width: 50%;
       }
 
       img {
@@ -29,7 +30,7 @@
     </style>
   </head>
   <body>
-    <div>
+    <!-- <div>
       <div class="relative">
         <h2>Original image</h2>
         <img id="image" src="./imgs/IMG_0158 2 Large.jpeg" alt="" crossorigin="anonymous" />
@@ -62,7 +63,11 @@
           <div><button id="img-btn">apply</button></div>
         </div>
       </div>
-    </div>
+    </div> -->
+
+    <button id="enableWebcamButton">ENABLE SEGMENTATION</button>
+    <video autoplay width="300" height="150"></video>
+    <canvas></canvas>
 
     <script src="./index.ts" type="module"></script>
   </body>
