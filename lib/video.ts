@@ -9,6 +9,7 @@ let video: HTMLVideoElement;
 let videoWidth: number; // same as natualWidth
 let videoHeight: number; // same as naturalHeight
 let isRunning = false;
+let internalCallback: (result: { imageData: ImageData; width: number; height: number }) => void;
 
 function callbackForVideo(result: ImageSegmenterResult) {
   if (!video || !canvasCtx || !result || !result.categoryMask) return;
@@ -86,7 +87,7 @@ function callbackForVideo(result: ImageSegmenterResult) {
   canvasCtx.globalCompositeOperation = "destination-over";
 
   // Blur background
-  canvasCtx.filter = "blur(1px)";
+  canvasCtx.filter = "blur(2px)";
   canvasCtx.drawImage(
     backgroundCanvas,
     0,
@@ -107,6 +108,12 @@ function callbackForVideo(result: ImageSegmenterResult) {
 
   canvasCtx.restore();
 
+  internalCallback({
+    imageData: canvasCtx.getImageData(0, 0, result.categoryMask.width, result.categoryMask.height),
+    width: result.categoryMask.width,
+    height: result.categoryMask.height,
+  });
+
   window.requestAnimationFrame(predictWebcam);
 }
 
@@ -125,16 +132,25 @@ const predictWebcam = () => {
   imageSegmenter.segmentForVideo(video, startTimeMs, callbackForVideo);
 };
 
-export const handleEffectVideo = (externalCanvas: HTMLCanvasElement, externalVideo: HTMLVideoElement) => {
-  canvas = externalCanvas;
-  canvasCtx = externalCanvas.getContext("2d", { willReadFrequently: true });
-  backgroundCanvas = <HTMLCanvasElement>externalCanvas.cloneNode();
-  backgroundCtx = backgroundCanvas.getContext("2d", { willReadFrequently: true });
+export const handleEffectVideo = (
+  externalVideo: HTMLVideoElement,
+  callback: (result: { imageData: ImageData; width: number; height: number }) => void
+) => {
   video = externalVideo;
+  internalCallback = callback;
 
   // segement on actual width/height
   videoWidth = video.videoWidth;
   videoHeight = video.videoHeight;
+
+  canvas = document.createElement("canvas");
+  canvasCtx = canvas.getContext("2d");
+
+  canvas.width = videoWidth;
+  canvas.height = videoHeight;
+
+  backgroundCanvas = <HTMLCanvasElement>canvas.cloneNode();
+  backgroundCtx = backgroundCanvas.getContext("2d", { willReadFrequently: true });
 
   imageSegmenter.setOptions({
     runningMode: "VIDEO",

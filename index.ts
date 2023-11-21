@@ -102,7 +102,7 @@ window.onload = async function () {
   enableWebcamButton?.addEventListener("click", async function () {
     if (!enableWebcamButton || !video) return;
 
-    canvas = <HTMLCanvasElement>document.getElementById("canvas-video");
+    const canvas5 = <HTMLCanvasElement>document.getElementById("canvas-video");
 
     toggleWebcam();
 
@@ -110,13 +110,22 @@ window.onload = async function () {
     const constraints = {
       video: {
         deviceId: undefined,
-        width: { ideal: 300, max: 1920 },
-        height: { ideal: 150, max: 1080 },
+        width: { ideal: 800, max: 1920 },
+        height: { ideal: 360, max: 1080 },
       },
     };
 
     // Activate the webcam stream.
     video.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
-    video.addEventListener("loadeddata", () => webcamRunning && handleEffectVideo(canvas, video));
+    video.addEventListener(
+      "loadeddata",
+      () =>
+        webcamRunning &&
+        handleEffectVideo(video, ({ imageData, width, height }) => {
+          canvas5.width = width;
+          canvas5.height = height;
+          canvas5.getContext("2d")?.putImageData(imageData, 0, 0);
+        })
+    );
   });
 };

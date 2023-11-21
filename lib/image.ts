@@ -30,7 +30,7 @@ export const createImageSegmenter = async () => {
       delegate: "GPU",
     },
     outputCategoryMask: true,
-    outputConfidenceMasks: true,
+    outputConfidenceMasks: false,
     runningMode: runningMode,
   });
 
