@@ -1,4 +1,4 @@
-# image-segmentation-ts
+# blur-background-ts
 
 - 🎆 Use latest [MediaPipe Solution](https://developers.google.com/mediapipe/solutions)
 - 🎉 Written in TypeScript
@@ -72,7 +72,7 @@ node 18
 ## Development
 
 ```
-git clone https://github.com/cuongle-hdwebsoft/image-segmentation-ts
+git clone https://github.com/cuongle-hdwebsoft/blur-background-ts
 npm i
 nvm use
 npm run dev
@@ -102,7 +102,7 @@ npm run dev
 
 ## Contact
 
-Contact to me through email <cuong.leminh@hdwebsoft.dev> or create [an issue](https://github.com/cuongle-hdwebsoft/image-segmentation-ts/issues).
+Contact to me through email <cuong.leminh@hdwebsoft.dev> or create [an issue](https://github.com/cuongle-hdwebsoft/blur-background-ts/issues).
 
 ## Reference
 
