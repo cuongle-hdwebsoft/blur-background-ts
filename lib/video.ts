@@ -87,6 +87,7 @@ function callbackForVideo(result: ImageSegmenterResult) {
   canvasCtx.globalCompositeOperation = "destination-over";
 
   // Blur background
+  // ISSUE: laggy
   canvasCtx.filter = "blur(2px)";
   canvasCtx.drawImage(
     backgroundCanvas,

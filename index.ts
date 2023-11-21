@@ -6,17 +6,7 @@ let webcamRunning = false;
 let image: HTMLImageElement;
 let canvas: HTMLCanvasElement;
 const enableWebcamButton = document.getElementById("enableWebcamButton");
-
-const toggleWebcam = () => {
-  if (webcamRunning === true) {
-    webcamRunning = false;
-    enableWebcamButton!.innerText = "ENABLE SEGMENTATION";
-    handleStopEffectVideo();
-  } else {
-    webcamRunning = true;
-    enableWebcamButton!.innerText = "DISABLE SEGMENTATION";
-  }
-};
+let stream: MediaStream;
 
 window.onload = async function () {
   const fileInput = <HTMLInputElement>document.querySelector("input[type=file]");
@@ -104,7 +94,23 @@ window.onload = async function () {
 
     const canvas5 = <HTMLCanvasElement>document.getElementById("canvas-video");
 
-    toggleWebcam();
+    if (webcamRunning === true) {
+      webcamRunning = false;
+      enableWebcamButton!.innerText = "ENABLE SEGMENTATION";
+
+      if (stream) {
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      }
+
+      handleStopEffectVideo();
+
+      return;
+    } else {
+      webcamRunning = true;
+      enableWebcamButton!.innerText = "DISABLE SEGMENTATION";
+    }
 
     // GetUsermedia parameters.
     const constraints = {
@@ -116,7 +122,8 @@ window.onload = async function () {
     };
 
     // Activate the webcam stream.
-    video.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = stream;
     video.addEventListener(
       "loadeddata",
       () =>
