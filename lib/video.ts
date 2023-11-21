@@ -60,10 +60,10 @@ function callbackForVideo(result: ImageSegmenterResult) {
     }
 
     // Transparent other pixels that are not person class
-    imageData[i * 4 + 0] = 0;
-    imageData[i * 4 + 1] = 0;
-    imageData[i * 4 + 2] = 0;
-    imageData[i * 4 + 3] = 0;
+    imageData[i * 4 + 0] = r;
+    imageData[i * 4 + 1] = b;
+    imageData[i * 4 + 2] = g;
+    imageData[i * 4 + 3] = 100;
 
     // Collect background pixels
     segmentationMask[i * 4 + 0] = r;
@@ -87,23 +87,24 @@ function callbackForVideo(result: ImageSegmenterResult) {
   canvasCtx.globalCompositeOperation = "destination-over";
 
   // Blur background
-  // ISSUE: laggy
-  canvasCtx.filter = "blur(2px)";
-  canvasCtx.drawImage(
-    backgroundCanvas,
-    0,
-    0,
-    result.categoryMask.width,
-    result.categoryMask.height,
-    0,
-    0,
-    result.categoryMask.width,
-    result.categoryMask.height
-  );
+  // ISSUE: laggy & does not support safari
+  // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter#browser_compatibility
+  // canvasCtx.filter = "blur(2px)";
+  // canvasCtx.drawImage(
+  //   backgroundCanvas,
+  //   0,
+  //   0,
+  //   result.categoryMask.width,
+  //   result.categoryMask.height,
+  //   0,
+  //   0,
+  //   result.categoryMask.width,
+  //   result.categoryMask.height
+  // );
 
   // Apply background color
   // canvasCtx.beginPath();
-  // canvasCtx.fillStyle = "red";
+  // canvasCtx.fillStyle = "green";
   // canvasCtx.rect(0, 0, result.categoryMask.width, result.categoryMask.height);
   // canvasCtx.fill();
 
