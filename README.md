@@ -5,7 +5,7 @@
 
 ## Demo
 
-[Try demo here](https://codesandbox.io/s/practical-browser-xz4g7j?file=/index.html)
+[Try demo here](https://2tgmmx-5173.csb.app/)
 
 ## Result example
 
@@ -67,7 +67,7 @@ video.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
 video.addEventListener("loadeddata", () => handleEffectVideo(canvas, video));
 ```
 
-[Try demo here](https://codesandbox.io/s/practical-browser-xz4g7j?file=/index.html)
+[Try demo here](https://2tgmmx-5173.csb.app/)
 
 ## Getting started
 
