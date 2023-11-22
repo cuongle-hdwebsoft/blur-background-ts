@@ -60,10 +60,10 @@ function callbackForVideo(result: ImageSegmenterResult) {
     }
 
     // Transparent other pixels that are not person class
-    imageData[i * 4 + 0] = r;
-    imageData[i * 4 + 1] = b;
-    imageData[i * 4 + 2] = g;
-    imageData[i * 4 + 3] = 100;
+    imageData[i * 4 + 0] = 0;
+    imageData[i * 4 + 1] = 0;
+    imageData[i * 4 + 2] = 0;
+    imageData[i * 4 + 3] = 0;
 
     // Collect background pixels
     segmentationMask[i * 4 + 0] = r;
@@ -72,10 +72,19 @@ function callbackForVideo(result: ImageSegmenterResult) {
     segmentationMask[i * 4 + 3] = a;
   }
 
-  // Draw person to main canvas
+  const resultCanvas = document.createElement("canvas");
+  resultCanvas.width = result.categoryMask.width;
+  resultCanvas.height = result.categoryMask.height;
+  const resultCanvasCtx = resultCanvas.getContext("2d");
+
+  // There maybe an issue, when trying to use 2 canvas to blur video.
+  // Draw person to main canvas -> Draw background to background canvas -> Draw background canvas to main canvas
+  // BTW, just use resultCanvas to draw all of them.
+
+  // Draw person to result canvas
   let uint8Array = new Uint8ClampedArray(imageData.buffer);
   let dataNew = new ImageData(uint8Array, result.categoryMask.width, result.categoryMask.height);
-  canvasCtx.putImageData(dataNew, 0, 0);
+  resultCanvasCtx?.putImageData(dataNew, 0, 0);
 
   // Draw background to background canvas
   uint8Array = new Uint8ClampedArray(segmentationMask.buffer);
@@ -83,35 +92,36 @@ function callbackForVideo(result: ImageSegmenterResult) {
   backgroundCtx?.putImageData(dataNew, 0, 0);
 
   // Draw a background canvas to main canvas
-  canvasCtx.save();
-  canvasCtx.globalCompositeOperation = "destination-over";
+  resultCanvasCtx!.save();
+  resultCanvasCtx!.globalCompositeOperation = "destination-over";
 
   // Blur background
-  // ISSUE: laggy & does not support safari
-  // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter#browser_compatibility
-  // canvasCtx.filter = "blur(2px)";
-  // canvasCtx.drawImage(
-  //   backgroundCanvas,
-  //   0,
-  //   0,
-  //   result.categoryMask.width,
-  //   result.categoryMask.height,
-  //   0,
-  //   0,
-  //   result.categoryMask.width,
-  //   result.categoryMask.height
-  // );
+  resultCanvasCtx!.filter = "blur(5px)";
+  // canvasCtx.filter = "grayscale(100%)";
+  resultCanvasCtx!.drawImage(
+    backgroundCanvas,
+    0,
+    0,
+    result.categoryMask.width,
+    result.categoryMask.height,
+    0,
+    0,
+    result.categoryMask.width,
+    result.categoryMask.height
+  );
 
-  // Apply background color
+  // --------------------------------
+  // Example: Apply background color|
+  // --------------------------------
   // canvasCtx.beginPath();
   // canvasCtx.fillStyle = "green";
   // canvasCtx.rect(0, 0, result.categoryMask.width, result.categoryMask.height);
   // canvasCtx.fill();
 
-  canvasCtx.restore();
+  resultCanvasCtx!.restore();
 
   internalCallback({
-    imageData: canvasCtx.getImageData(0, 0, result.categoryMask.width, result.categoryMask.height),
+    imageData: resultCanvasCtx!.getImageData(0, 0, result.categoryMask.width, result.categoryMask.height),
     width: result.categoryMask.width,
     height: result.categoryMask.height,
   });
@@ -164,4 +174,5 @@ export const handleEffectVideo = (
 
 export const handleStopEffectVideo = () => {
   isRunning = false;
+  video.pause();
 };
