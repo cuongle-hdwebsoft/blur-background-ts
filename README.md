@@ -5,57 +5,61 @@
 
 ## Demo
 
-[Try demo here](https://codesandbox.io/s/practical-browser-xz4g7j?file=/index.html)
+[Try demo here](https://2tgmmx-5173.csb.app/)
 
 ## Result example
 
 ### Blur
 
-- `handleEffectImage(canvas, image, { type: TYPE.BLUR })`
+```ts
+handleEffectImage(image, { type: TYPE.BLUR }, ({ imageData, width, height }) => {
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d")?.putImageData(imageData, 0, 0);
+});
+```
 
 ![alt](./docs/blur.png)
 
 ### Change background color
 
-- `handleEffectImage(canvas, image, { type: TYPE.BG_COLOR, color: "blue" });`
+```ts
+handleEffectImage(image, { type: TYPE.BG_COLOR, color: "blue" }, ({ imageData, width, height }) => {
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d")?.putImageData(imageData, 0, 0);
+});
+```
 
 ![alt](./docs/bg-color.png)
 
 ### Crop only person
 
-- `handleEffectImage(canvas, image, { type: TYPE.CROP });`
+```ts
+handleEffectImage(image, { type: TYPE.CROP }, ({ imageData, width, height }) => {
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d")?.putImageData(imageData, 0, 0);
+});
+```
 
 ![alt](./docs/crop-background.png)
 
 ### Change background to new image
 
-- `handleEffectImage(canvas, image, { type: TYPE.IMAGE, imgSrc: bgImg });`
+```ts
+handleEffectImage(image, { type: TYPE.IMAGE, imgSrc: bgImg }, ({ imageData, width, height }) => {
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d")?.putImageData(imageData, 0, 0);
+});
+```
 
 ![alt](./docs/bg-img.png)
 
-[Here is the image that I used](https://www.freepik.com/free-photo/woman-with-headset-having-video-call-laptop_12457231.htm#page=3&query=person%20zoom&position=24&from_view=search&track=ais&uuid=bba742d7-d9ff-4ced-8327-6cc9f1f65924)
+### Blur webcam background
 
-## Getting started
-
-- Init segmentation
-
-```
-import { imageSegmenter, init, handleEffectVideo, handleEffectImage } from "./lib/index";
-
-await init();
-```
-
-- Blur background image
-
-```
-const image = <HTMLImageElement>document.getElementById("image");
-canvas = <HTMLCanvasElement>document.getElementById("canvas");
-handleEffectImage(canvas, image, { type: TYPE.BLUR });
-```
-
-- Blur webcam background
-
-```
+```ts
 const video = <HTMLVideoElement>document.querySelector("video");
 const canvas = <HTMLCanvasElement>document.getElementById("canvas-video");
 
@@ -63,15 +67,35 @@ video.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
 video.addEventListener("loadeddata", () => handleEffectVideo(canvas, video));
 ```
 
+[Try demo here](https://2tgmmx-5173.csb.app/)
+
+## Getting started
+
+- Init segmentation
+
+```ts
+import { imageSegmenter, init, handleEffectVideo, handleEffectImage } from "./lib/index";
+
+await init();
+```
+
+- Blur background image
+
+```ts
+const image = <HTMLImageElement>document.getElementById("image");
+canvas = <HTMLCanvasElement>document.getElementById("canvas");
+handleEffectImage(canvas, image, { type: TYPE.BLUR });
+```
+
 ## Requirement
 
-```
+```bash
 node 18
 ```
 
 ## Development
 
-```
+```bash
 git clone https://github.com/cuongle-hdwebsoft/blur-background-ts
 npm i
 nvm use
@@ -100,10 +124,12 @@ npm run dev
 
 [10. What is the `globalCompositeOperation`?](https://www.w3schools.com/jsref/playcanvas.php?filename=playcanvas_globalcompop&preval=source-in)
 
+## Reference
+
+[1. https://github.com/akhil-rana/virtual-bg](https://github.com/akhil-rana/virtual-bg)
+
+[2. Example image](https://www.freepik.com/free-photo/woman-with-headset-having-video-call-laptop_12457231.htm#page=3&query=person%20zoom&position=24&from_view=search&track=ais&uuid=bba742d7-d9ff-4ced-8327-6cc9f1f65924)
+
 ## Contact
 
 Contact to me through email <cuong.leminh@hdwebsoft.dev> or create [an issue](https://github.com/cuongle-hdwebsoft/blur-background-ts/issues).
-
-## Reference
-
-[https://github.com/akhil-rana/virtual-bg](https://github.com/akhil-rana/virtual-bg)
