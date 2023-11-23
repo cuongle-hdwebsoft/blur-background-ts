@@ -60,11 +60,18 @@ handleEffectImage(image, { type: TYPE.IMAGE, imgSrc: bgImg }, ({ imageData, widt
 ### Blur webcam background
 
 ```ts
-const video = <HTMLVideoElement>document.querySelector("video");
-const canvas = <HTMLCanvasElement>document.getElementById("canvas-video");
-
-video.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
-video.addEventListener("loadeddata", () => handleEffectVideo(canvas, video));
+stream = await navigator.mediaDevices.getUserMedia(constraints);
+video.srcObject = stream;
+video.addEventListener(
+  "loadeddata",
+  () =>
+    webcamRunning &&
+    handleEffectVideo(video, ({ imageData, width, height }) => {
+      canvas5.width = width;
+      canvas5.height = height;
+      canvas5.getContext("2d")?.putImageData(imageData, 0, 0);
+    })
+);
 ```
 
 [Try demo here](https://2tgmmx-5173.csb.app/)
