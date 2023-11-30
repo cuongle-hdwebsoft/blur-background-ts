@@ -1,5 +1,6 @@
 import { ImageSegmenterResult } from "@mediapipe/tasks-vision";
 import { imageSegmenter } from "./index.ts";
+import blend_two_colors from "../utils/blend-two-colors.ts";
 
 let canvas: HTMLCanvasElement;
 let canvasCtx: CanvasRenderingContext2D | null;
@@ -35,8 +36,6 @@ function callbackForVideo(result: ImageSegmenterResult) {
 
   const mask = result.confidenceMasks?.[0].getAsFloat32Array();
 
-  console.log("hello world");
-
   if (!mask) return;
 
   for (let i = 0; i < mask.length; i++) {
@@ -45,39 +44,50 @@ function callbackForVideo(result: ImageSegmenterResult) {
     const g = cloneImageData[i * 4 + 2];
     const a = cloneImageData[i * 4 + 3];
 
-    if (mask[i] >= 0.15 && mask[i] <= 0.2) {
-      imageData[i * 4 + 0] = previousResultImageData ? previousResultImageData[i * 4 + 0] : 255;
-      imageData[i * 4 + 1] = previousResultImageData ? previousResultImageData[i * 4 + 1] : 165;
-      imageData[i * 4 + 2] = previousResultImageData ? previousResultImageData[i * 4 + 2] : 0;
+    if (mask[i] >= 0.1 && mask[i] <= 0.15) {
+      const blendColor = blend_two_colors(
+        [r, b, g, a],
+        [
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+        ]
+      );
+
+      imageData[i * 4 + 0] = blendColor[0];
+      imageData[i * 4 + 1] = blendColor[1];
+      imageData[i * 4 + 2] = blendColor[2];
+      imageData[i * 4 + 3] = blendColor[3];
+
+      continue;
+    }
+
+    if (mask[i] >= 0.15 && mask[i] < 0.2) {
+      // imageData[i * 4 + 0] = 255;
+      // imageData[i * 4 + 1] = 0;
+      // imageData[i * 4 + 2] = 0;
       // imageData[i * 4 + 3] = 255;
 
-      // imageData[i * 4 + 0] = r;
-      // imageData[i * 4 + 1] = b;
-      // imageData[i * 4 + 2] = g;
-      // imageData[i * 4 + 3] = 100;
+      const blendColor = blend_two_colors(
+        [r, b, g, a],
+        [
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+        ]
+      );
+
+      imageData[i * 4 + 0] = blendColor[0];
+      imageData[i * 4 + 1] = blendColor[1];
+      imageData[i * 4 + 2] = blendColor[2];
+      imageData[i * 4 + 3] = blendColor[3];
 
       continue;
     }
 
-    if (mask[i] >= 0.15 && mask[i] <= 0.4) {
-      imageData[i * 4 + 0] = 255;
-      imageData[i * 4 + 1] = 0;
-      imageData[i * 4 + 2] = 0;
-      imageData[i * 4 + 3] = 255;
-
-      // imageData[i * 4 + 0] = previousResultImageData ? (previousResultImageData[i * 4 + 0] + r) / 2 : 255;
-      // imageData[i * 4 + 1] = previousResultImageData ? (previousResultImageData[i * 4 + 1] + b) / 2 : 0;
-      // imageData[i * 4 + 2] = previousResultImageData ? (previousResultImageData[i * 4 + 2] + g) / 2 : 0;
-
-      continue;
-    }
-
-    if (mask[i] >= 0.6 && mask[i] < 0.7) {
-      imageData[i * 4 + 0] = r;
-      imageData[i * 4 + 1] = b;
-      imageData[i * 4 + 2] = g;
-      imageData[i * 4 + 3] = a;
-
+    if (mask[i] >= 0.67 && mask[i] < 0.7) {
       continue;
     }
 
@@ -172,7 +182,6 @@ function callbackForVideo(result: ImageSegmenterResult) {
 
 let lastWebcamTime = -1;
 const predictWebcam = () => {
-  console.log(!video, !canvasCtx, imageSegmenter === undefined, !isRunning);
   if (!video || !canvasCtx || imageSegmenter === undefined || !isRunning) return;
 
   if (video.currentTime === lastWebcamTime) {
