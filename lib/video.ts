@@ -45,7 +45,20 @@ function callbackForVideo(result: ImageSegmenterResult) {
     const g = cloneImageData[i * 4 + 2];
     const a = cloneImageData[i * 4 + 3];
 
-    if (mask[i] > 0.8) {
+    if (mask[i] >= 0.65 && mask[i] < 0.8) {
+      // imageData[i * 4 + 0] = previousResultImageData ? (previousResultImageData[i * 4 + 0] + r) / 2 : r;
+      // imageData[i * 4 + 1] = previousResultImageData ? (previousResultImageData[i * 4 + 1] + b) / 2 : b;
+      // imageData[i * 4 + 2] = previousResultImageData ? (previousResultImageData[i * 4 + 2] + g) / 2 : g;
+      // imageData[i * 4 + 3] = 255;
+      imageData[i * 4 + 0] = r;
+      imageData[i * 4 + 1] = b;
+      imageData[i * 4 + 2] = g;
+      imageData[i * 4 + 3] = a;
+
+      continue;
+    }
+
+    if (mask[i] >= 0.8) {
       // Collect person pixels
       imageData[i * 4 + 0] = r;
       imageData[i * 4 + 1] = b;
@@ -58,14 +71,6 @@ function callbackForVideo(result: ImageSegmenterResult) {
       segmentationMask[i * 4 + 2] = 0;
       segmentationMask[i * 4 + 3] = 0;
 
-      continue;
-    }
-
-    if (mask[i] >= 0.65 && mask[i] <= 0.7) {
-      imageData[i * 4 + 0] = previousResultImageData ? (previousResultImageData[i * 4 + 0] + r) / 2 : r;
-      imageData[i * 4 + 1] = previousResultImageData ? (previousResultImageData[i * 4 + 1] + b) / 2 : b;
-      imageData[i * 4 + 2] = previousResultImageData ? (previousResultImageData[i * 4 + 2] + g) / 2 : g;
-      imageData[i * 4 + 3] = previousResultImageData ? (previousResultImageData[i * 4 + 3] + a) / 2 : a;
       continue;
     }
 
@@ -106,7 +111,8 @@ function callbackForVideo(result: ImageSegmenterResult) {
   resultCanvasCtx!.globalCompositeOperation = "destination-over";
 
   // Blur background
-  resultCanvasCtx!.filter = internalOptions?.blur ? `blur(${internalOptions.blur}px)` : "blur(4px)";
+  resultCanvasCtx!.filter =
+    typeof internalOptions?.blur !== "undefined" ? `blur(${internalOptions.blur}px)` : "blur(2px)";
   // canvasCtx.filter = "grayscale(100%)";
   resultCanvasCtx!.drawImage(
     cloneCanvas,
@@ -138,8 +144,6 @@ function callbackForVideo(result: ImageSegmenterResult) {
     height: result.categoryMask.height,
   });
 
-  console.log("first");
-
   window.requestAnimationFrame(predictWebcam);
 }
 
@@ -147,8 +151,6 @@ let lastWebcamTime = -1;
 const predictWebcam = () => {
   console.log(!video, !canvasCtx, imageSegmenter === undefined, !isRunning);
   if (!video || !canvasCtx || imageSegmenter === undefined || !isRunning) return;
-
-  console.log("video.currentTime", video.currentTime, lastWebcamTime);
 
   if (video.currentTime === lastWebcamTime) {
     window.requestAnimationFrame(predictWebcam);
