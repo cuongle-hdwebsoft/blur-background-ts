@@ -45,11 +45,34 @@ function callbackForVideo(result: ImageSegmenterResult) {
     const g = cloneImageData[i * 4 + 2];
     const a = cloneImageData[i * 4 + 3];
 
-    if (mask[i] >= 0.65 && mask[i] < 0.8) {
-      // imageData[i * 4 + 0] = previousResultImageData ? (previousResultImageData[i * 4 + 0] + r) / 2 : r;
-      // imageData[i * 4 + 1] = previousResultImageData ? (previousResultImageData[i * 4 + 1] + b) / 2 : b;
-      // imageData[i * 4 + 2] = previousResultImageData ? (previousResultImageData[i * 4 + 2] + g) / 2 : g;
+    if (mask[i] >= 0.15 && mask[i] <= 0.2) {
+      imageData[i * 4 + 0] = previousResultImageData ? previousResultImageData[i * 4 + 0] : 255;
+      imageData[i * 4 + 1] = previousResultImageData ? previousResultImageData[i * 4 + 1] : 165;
+      imageData[i * 4 + 2] = previousResultImageData ? previousResultImageData[i * 4 + 2] : 0;
       // imageData[i * 4 + 3] = 255;
+
+      // imageData[i * 4 + 0] = r;
+      // imageData[i * 4 + 1] = b;
+      // imageData[i * 4 + 2] = g;
+      // imageData[i * 4 + 3] = 100;
+
+      continue;
+    }
+
+    if (mask[i] >= 0.15 && mask[i] <= 0.4) {
+      imageData[i * 4 + 0] = 255;
+      imageData[i * 4 + 1] = 0;
+      imageData[i * 4 + 2] = 0;
+      imageData[i * 4 + 3] = 255;
+
+      // imageData[i * 4 + 0] = previousResultImageData ? (previousResultImageData[i * 4 + 0] + r) / 2 : 255;
+      // imageData[i * 4 + 1] = previousResultImageData ? (previousResultImageData[i * 4 + 1] + b) / 2 : 0;
+      // imageData[i * 4 + 2] = previousResultImageData ? (previousResultImageData[i * 4 + 2] + g) / 2 : 0;
+
+      continue;
+    }
+
+    if (mask[i] >= 0.6 && mask[i] < 0.7) {
       imageData[i * 4 + 0] = r;
       imageData[i * 4 + 1] = b;
       imageData[i * 4 + 2] = g;
@@ -58,7 +81,7 @@ function callbackForVideo(result: ImageSegmenterResult) {
       continue;
     }
 
-    if (mask[i] >= 0.8) {
+    if (mask[i] >= 0.7 || (mask[i] > 0.4 && mask[i] < 0.6)) {
       // Collect person pixels
       imageData[i * 4 + 0] = r;
       imageData[i * 4 + 1] = b;
@@ -66,10 +89,10 @@ function callbackForVideo(result: ImageSegmenterResult) {
       imageData[i * 4 + 3] = a;
 
       // Collect background pixels
-      segmentationMask[i * 4 + 0] = 0;
-      segmentationMask[i * 4 + 1] = 0;
-      segmentationMask[i * 4 + 2] = 0;
-      segmentationMask[i * 4 + 3] = 0;
+      // segmentationMask[i * 4 + 0] = 0;
+      // segmentationMask[i * 4 + 1] = 0;
+      // segmentationMask[i * 4 + 2] = 0;
+      // segmentationMask[i * 4 + 3] = 0;
 
       continue;
     }
@@ -81,10 +104,10 @@ function callbackForVideo(result: ImageSegmenterResult) {
     imageData[i * 4 + 3] = 0;
 
     // Collect background pixels
-    segmentationMask[i * 4 + 0] = 0;
-    segmentationMask[i * 4 + 1] = 0;
-    segmentationMask[i * 4 + 2] = 0;
-    segmentationMask[i * 4 + 3] = 0;
+    // segmentationMask[i * 4 + 0] = 0;
+    // segmentationMask[i * 4 + 1] = 0;
+    // segmentationMask[i * 4 + 2] = 0;
+    // segmentationMask[i * 4 + 3] = 0;
   }
 
   const resultCanvas = document.createElement("canvas");
@@ -102,9 +125,9 @@ function callbackForVideo(result: ImageSegmenterResult) {
   resultCanvasCtx?.putImageData(dataNew, 0, 0);
 
   // Draw background to background canvas
-  uint8Array = new Uint8ClampedArray(segmentationMask.buffer);
-  dataNew = new ImageData(uint8Array, result.categoryMask.width, result.categoryMask.height);
-  backgroundCtx?.putImageData(dataNew, 0, 0);
+  // uint8Array = new Uint8ClampedArray(segmentationMask.buffer);
+  // dataNew = new ImageData(uint8Array, result.categoryMask.width, result.categoryMask.height);
+  // backgroundCtx?.putImageData(dataNew, 0, 0);
 
   // Draw a background canvas to main canvas
   resultCanvasCtx!.save();
