@@ -5,7 +5,8 @@ import scaleImageToFitCanvas from "../utils/scale-image-to-fit-canvas";
 let labels: string[] = [];
 const runningMode = "IMAGE";
 const WASM_PATH = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm";
-const MODEL_ASSET_PATH = "https://storage.googleapis.com/mediapipe-assets/deeplabv3.tflite?generation=1661875711618421";
+// const MODEL_ASSET_PATH = "https://storage.googleapis.com/mediapipe-assets/deeplabv3.tflite?generation=1661875711618421";
+const MODEL_ASSET_PATH = "./app/shared/models/selfie_segmentation_landscape.tflite";
 
 export enum TYPE {
   BLUR = "BLUR",
@@ -30,7 +31,7 @@ export const createImageSegmenter = async () => {
       delegate: "GPU",
     },
     outputCategoryMask: true,
-    outputConfidenceMasks: false,
+    outputConfidenceMasks: true,
     runningMode: runningMode,
   });
 
@@ -80,7 +81,7 @@ export const handleSegmentData = (
     if (!obj[mask[i]]) obj[mask[i]] = 1;
     else obj[mask[i]]++;
 
-    if (labels[mask[i]] === "person") {
+    if (mask[i] === 0) {
       imageData[i * 4 + 0] = r;
       imageData[i * 4 + 1] = b;
       imageData[i * 4 + 2] = g;

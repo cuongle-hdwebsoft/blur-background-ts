@@ -4,12 +4,22 @@ import { toBase64 } from "./utils/convert-file-to-img-base64";
 
 let webcamRunning = false;
 let image: HTMLImageElement;
-let canvas: HTMLCanvasElement;
 const enableWebcamButton = document.getElementById("enableWebcamButton");
 let stream: MediaStream;
+let blur;
 
 window.onload = async function () {
   const fileInput = <HTMLInputElement>document.querySelector("input[type=file]");
+  const blurInput = <HTMLInputElement>document.querySelector("#blur-range");
+  blur = blurInput.value;
+
+  blurInput.onchange = function (e: any) {
+    console.log(e.target.value);
+    blur = e.target.value;
+    stopVideo();
+    startVideo();
+  };
+
   fileInput.onchange = async function (ev) {
     const base64 = await toBase64((ev.target as any).files[0] as File);
     const imgEl = document.createElement("img");
@@ -20,9 +30,7 @@ window.onload = async function () {
       originalImage.setAttribute("src", base64);
     }
 
-    webcamRunning = false;
-    enableWebcamButton!.innerText = "ENABLE SEGMENTATION";
-    handleStopEffectVideo();
+    stopVideo();
 
     const canvas1 = <HTMLCanvasElement>document.getElementById("canvas");
     handleEffectImage(image, { type: TYPE.BLUR }, ({ imageData, width, height }) => {
@@ -89,7 +97,7 @@ window.onload = async function () {
 
   const video = <HTMLVideoElement>document.querySelector("video");
 
-  enableWebcamButton?.addEventListener("click", async function () {
+  const startVideo = async function () {
     if (!enableWebcamButton || !video) return;
 
     const canvas5 = <HTMLCanvasElement>document.getElementById("canvas-video");
@@ -104,7 +112,7 @@ window.onload = async function () {
         });
       }
 
-      handleStopEffectVideo();
+      stopVideo();
 
       return;
     } else {
@@ -128,11 +136,23 @@ window.onload = async function () {
       "loadeddata",
       () =>
         webcamRunning &&
-        handleEffectVideo(video, ({ imageData, width, height }) => {
-          canvas5.width = width;
-          canvas5.height = height;
-          canvas5.getContext("2d")?.putImageData(imageData, 0, 0);
-        })
+        handleEffectVideo(
+          video,
+          ({ imageData, width, height }) => {
+            canvas5.width = width;
+            canvas5.height = height;
+            canvas5.getContext("2d")?.putImageData(imageData, 0, 0);
+          },
+          { blur }
+        )
     );
-  });
+  };
+
+  const stopVideo = () => {
+    webcamRunning = false;
+    enableWebcamButton!.innerText = "ENABLE SEGMENTATION";
+    handleStopEffectVideo();
+  };
+
+  enableWebcamButton?.addEventListener("click", startVideo);
 };

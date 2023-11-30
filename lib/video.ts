@@ -10,6 +10,12 @@ let videoWidth: number; // same as natualWidth
 let videoHeight: number; // same as naturalHeight
 let isRunning = false;
 let internalCallback: (result: { imageData: ImageData; width: number; height: number }) => void;
+let internalOptions:
+  | {
+      blur?: number;
+    }
+  | undefined;
+let previousResultImageData: ImageData;
 
 function callbackForVideo(result: ImageSegmenterResult) {
   if (!video || !canvasCtx || !result || !result.categoryMask) return;
@@ -27,23 +33,19 @@ function callbackForVideo(result: ImageSegmenterResult) {
   cloneContext.drawImage(video, 0, 0, result.categoryMask?.width, result.categoryMask?.height);
   const cloneImageData = cloneContext.getImageData(0, 0, result.categoryMask.width, result.categoryMask.height).data;
 
-  const mask = result.categoryMask?.getAsFloat32Array();
+  const mask = result.confidenceMasks?.[0].getAsFloat32Array();
+
+  console.log("hello world");
 
   if (!mask) return;
 
-  const obj = {};
   for (let i = 0; i < mask.length; i++) {
-    const maskVal = Math.round(mask[i] * 255.0);
-
     const r = cloneImageData[i * 4 + 0];
     const b = cloneImageData[i * 4 + 1];
     const g = cloneImageData[i * 4 + 2];
     const a = cloneImageData[i * 4 + 3];
 
-    if (!obj[maskVal]) obj[maskVal] = 1;
-    else obj[maskVal]++;
-
-    if (maskVal === 15) {
+    if (mask[i] > 0.8) {
       // Collect person pixels
       imageData[i * 4 + 0] = r;
       imageData[i * 4 + 1] = b;
@@ -59,6 +61,14 @@ function callbackForVideo(result: ImageSegmenterResult) {
       continue;
     }
 
+    if (mask[i] >= 0.65 && mask[i] <= 0.7) {
+      imageData[i * 4 + 0] = previousResultImageData ? (previousResultImageData[i * 4 + 0] + r) / 2 : r;
+      imageData[i * 4 + 1] = previousResultImageData ? (previousResultImageData[i * 4 + 1] + b) / 2 : b;
+      imageData[i * 4 + 2] = previousResultImageData ? (previousResultImageData[i * 4 + 2] + g) / 2 : g;
+      imageData[i * 4 + 3] = previousResultImageData ? (previousResultImageData[i * 4 + 3] + a) / 2 : a;
+      continue;
+    }
+
     // Transparent other pixels that are not person class
     imageData[i * 4 + 0] = 0;
     imageData[i * 4 + 1] = 0;
@@ -66,10 +76,10 @@ function callbackForVideo(result: ImageSegmenterResult) {
     imageData[i * 4 + 3] = 0;
 
     // Collect background pixels
-    segmentationMask[i * 4 + 0] = r;
-    segmentationMask[i * 4 + 1] = b;
-    segmentationMask[i * 4 + 2] = g;
-    segmentationMask[i * 4 + 3] = a;
+    segmentationMask[i * 4 + 0] = 0;
+    segmentationMask[i * 4 + 1] = 0;
+    segmentationMask[i * 4 + 2] = 0;
+    segmentationMask[i * 4 + 3] = 0;
   }
 
   const resultCanvas = document.createElement("canvas");
@@ -96,10 +106,10 @@ function callbackForVideo(result: ImageSegmenterResult) {
   resultCanvasCtx!.globalCompositeOperation = "destination-over";
 
   // Blur background
-  resultCanvasCtx!.filter = "blur(5px)";
+  resultCanvasCtx!.filter = internalOptions?.blur ? `blur(${internalOptions.blur}px)` : "blur(4px)";
   // canvasCtx.filter = "grayscale(100%)";
   resultCanvasCtx!.drawImage(
-    backgroundCanvas,
+    cloneCanvas,
     0,
     0,
     result.categoryMask.width,
@@ -120,18 +130,25 @@ function callbackForVideo(result: ImageSegmenterResult) {
 
   resultCanvasCtx!.restore();
 
+  previousResultImageData = resultCanvasCtx!.getImageData(0, 0, result.categoryMask.width, result.categoryMask.height);
+
   internalCallback({
-    imageData: resultCanvasCtx!.getImageData(0, 0, result.categoryMask.width, result.categoryMask.height),
+    imageData: previousResultImageData,
     width: result.categoryMask.width,
     height: result.categoryMask.height,
   });
+
+  console.log("first");
 
   window.requestAnimationFrame(predictWebcam);
 }
 
 let lastWebcamTime = -1;
 const predictWebcam = () => {
+  console.log(!video, !canvasCtx, imageSegmenter === undefined, !isRunning);
   if (!video || !canvasCtx || imageSegmenter === undefined || !isRunning) return;
+
+  console.log("video.currentTime", video.currentTime, lastWebcamTime);
 
   if (video.currentTime === lastWebcamTime) {
     window.requestAnimationFrame(predictWebcam);
@@ -146,10 +163,14 @@ const predictWebcam = () => {
 
 export const handleEffectVideo = (
   externalVideo: HTMLVideoElement,
-  callback: (result: { imageData: ImageData; width: number; height: number }) => void
+  callback: (result: { imageData: ImageData; width: number; height: number }) => void,
+  options?: {
+    blur?: number;
+  }
 ) => {
   video = externalVideo;
   internalCallback = callback;
+  internalOptions = options;
 
   // segement on actual width/height
   videoWidth = video.videoWidth;
