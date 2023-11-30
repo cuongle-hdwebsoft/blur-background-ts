@@ -1,5 +1,6 @@
 import { ImageSegmenterResult } from "@mediapipe/tasks-vision";
 import { imageSegmenter } from "./index.ts";
+import blend_two_colors from "../utils/blend-two-colors.ts";
 
 let canvas: HTMLCanvasElement;
 let canvasCtx: CanvasRenderingContext2D | null;
@@ -10,6 +11,12 @@ let videoWidth: number; // same as natualWidth
 let videoHeight: number; // same as naturalHeight
 let isRunning = false;
 let internalCallback: (result: { imageData: ImageData; width: number; height: number }) => void;
+let internalOptions:
+  | {
+      blur?: number;
+    }
+  | undefined;
+let previousResultImageData: ImageData;
 
 function callbackForVideo(result: ImageSegmenterResult) {
   if (!video || !canvasCtx || !result || !result.categoryMask) return;
@@ -27,23 +34,64 @@ function callbackForVideo(result: ImageSegmenterResult) {
   cloneContext.drawImage(video, 0, 0, result.categoryMask?.width, result.categoryMask?.height);
   const cloneImageData = cloneContext.getImageData(0, 0, result.categoryMask.width, result.categoryMask.height).data;
 
-  const mask = result.categoryMask?.getAsFloat32Array();
+  const mask = result.confidenceMasks?.[0].getAsFloat32Array();
 
   if (!mask) return;
 
-  const obj = {};
   for (let i = 0; i < mask.length; i++) {
-    const maskVal = Math.round(mask[i] * 255.0);
-
     const r = cloneImageData[i * 4 + 0];
     const b = cloneImageData[i * 4 + 1];
     const g = cloneImageData[i * 4 + 2];
     const a = cloneImageData[i * 4 + 3];
 
-    if (!obj[maskVal]) obj[maskVal] = 1;
-    else obj[maskVal]++;
+    if (mask[i] >= 0.1 && mask[i] <= 0.15) {
+      const blendColor = blend_two_colors(
+        [r, b, g, a],
+        [
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+        ]
+      );
 
-    if (maskVal === 15) {
+      imageData[i * 4 + 0] = blendColor[0];
+      imageData[i * 4 + 1] = blendColor[1];
+      imageData[i * 4 + 2] = blendColor[2];
+      imageData[i * 4 + 3] = blendColor[3];
+
+      continue;
+    }
+
+    if (mask[i] >= 0.15 && mask[i] < 0.2) {
+      // imageData[i * 4 + 0] = 255;
+      // imageData[i * 4 + 1] = 0;
+      // imageData[i * 4 + 2] = 0;
+      // imageData[i * 4 + 3] = 255;
+
+      const blendColor = blend_two_colors(
+        [r, b, g, a],
+        [
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+          previousResultImageData[i * 4 + 0],
+        ]
+      );
+
+      imageData[i * 4 + 0] = blendColor[0];
+      imageData[i * 4 + 1] = blendColor[1];
+      imageData[i * 4 + 2] = blendColor[2];
+      imageData[i * 4 + 3] = blendColor[3];
+
+      continue;
+    }
+
+    if (mask[i] >= 0.67 && mask[i] < 0.7) {
+      continue;
+    }
+
+    if (mask[i] >= 0.7 || (mask[i] > 0.4 && mask[i] < 0.6)) {
       // Collect person pixels
       imageData[i * 4 + 0] = r;
       imageData[i * 4 + 1] = b;
@@ -51,10 +99,10 @@ function callbackForVideo(result: ImageSegmenterResult) {
       imageData[i * 4 + 3] = a;
 
       // Collect background pixels
-      segmentationMask[i * 4 + 0] = 0;
-      segmentationMask[i * 4 + 1] = 0;
-      segmentationMask[i * 4 + 2] = 0;
-      segmentationMask[i * 4 + 3] = 0;
+      // segmentationMask[i * 4 + 0] = 0;
+      // segmentationMask[i * 4 + 1] = 0;
+      // segmentationMask[i * 4 + 2] = 0;
+      // segmentationMask[i * 4 + 3] = 0;
 
       continue;
     }
@@ -66,10 +114,10 @@ function callbackForVideo(result: ImageSegmenterResult) {
     imageData[i * 4 + 3] = 0;
 
     // Collect background pixels
-    segmentationMask[i * 4 + 0] = r;
-    segmentationMask[i * 4 + 1] = b;
-    segmentationMask[i * 4 + 2] = g;
-    segmentationMask[i * 4 + 3] = a;
+    // segmentationMask[i * 4 + 0] = 0;
+    // segmentationMask[i * 4 + 1] = 0;
+    // segmentationMask[i * 4 + 2] = 0;
+    // segmentationMask[i * 4 + 3] = 0;
   }
 
   const resultCanvas = document.createElement("canvas");
@@ -87,19 +135,20 @@ function callbackForVideo(result: ImageSegmenterResult) {
   resultCanvasCtx?.putImageData(dataNew, 0, 0);
 
   // Draw background to background canvas
-  uint8Array = new Uint8ClampedArray(segmentationMask.buffer);
-  dataNew = new ImageData(uint8Array, result.categoryMask.width, result.categoryMask.height);
-  backgroundCtx?.putImageData(dataNew, 0, 0);
+  // uint8Array = new Uint8ClampedArray(segmentationMask.buffer);
+  // dataNew = new ImageData(uint8Array, result.categoryMask.width, result.categoryMask.height);
+  // backgroundCtx?.putImageData(dataNew, 0, 0);
 
   // Draw a background canvas to main canvas
   resultCanvasCtx!.save();
   resultCanvasCtx!.globalCompositeOperation = "destination-over";
 
   // Blur background
-  resultCanvasCtx!.filter = "blur(5px)";
+  resultCanvasCtx!.filter =
+    typeof internalOptions?.blur !== "undefined" ? `blur(${internalOptions.blur}px)` : "blur(2px)";
   // canvasCtx.filter = "grayscale(100%)";
   resultCanvasCtx!.drawImage(
-    backgroundCanvas,
+    cloneCanvas,
     0,
     0,
     result.categoryMask.width,
@@ -120,8 +169,10 @@ function callbackForVideo(result: ImageSegmenterResult) {
 
   resultCanvasCtx!.restore();
 
+  previousResultImageData = resultCanvasCtx!.getImageData(0, 0, result.categoryMask.width, result.categoryMask.height);
+
   internalCallback({
-    imageData: resultCanvasCtx!.getImageData(0, 0, result.categoryMask.width, result.categoryMask.height),
+    imageData: previousResultImageData,
     width: result.categoryMask.width,
     height: result.categoryMask.height,
   });
@@ -146,10 +197,14 @@ const predictWebcam = () => {
 
 export const handleEffectVideo = (
   externalVideo: HTMLVideoElement,
-  callback: (result: { imageData: ImageData; width: number; height: number }) => void
+  callback: (result: { imageData: ImageData; width: number; height: number }) => void,
+  options?: {
+    blur?: number;
+  }
 ) => {
   video = externalVideo;
   internalCallback = callback;
+  internalOptions = options;
 
   // segement on actual width/height
   videoWidth = video.videoWidth;

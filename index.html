@@ -13,7 +13,7 @@
       }
 
       .container {
-        width: 50%;
+        width: 60%;
         margin: auto;
         max-width: 700px;
         min-width: 300px;
@@ -70,7 +70,7 @@
   </head>
   <body>
     <div class="container">
-      <div class="relative">
+      <!-- <div class="relative">
         <h1 class="text-center">blur-background-ts</h1>
         <img id="image" src="./imgs/IMG_0158 2 Large.jpeg" alt="" crossorigin="anonymous" />
         <input accept="image/*" type="file" />
@@ -103,7 +103,7 @@
             alt=""
           />
         </div>
-      </div>
+      </div> -->
 
       <div class="item">
         <h3 class="text-center">Blur webcam</h3>
@@ -115,8 +115,15 @@
           width="300"
           height="150"
         ></video>
-        <canvas width="300" height="150" id="canvas-video"></canvas>
-        <div><button type="button" style="margin-top: 5px" id="enableWebcamButton">ENABLE SEGMENTATION</button></div>
+        <canvas style="transform: rotateY('180deg')" width="300" height="150" id="canvas-video"></canvas>
+        <div></div>
+        <div>
+          <div style="margin-bottom: 8px">
+            <label for="blur-range">Blur</label>
+            <input id="blur-range" type="range" min="1" max="10" value="7" step="1" />
+          </div>
+          <button type="button" style="margin-top: 5px" id="enableWebcamButton">ENABLE SEGMENTATION</button>
+        </div>
       </div>
     </div>
 

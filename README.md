@@ -89,9 +89,11 @@ await init();
 - Blur background image
 
 ```ts
-const image = <HTMLImageElement>document.getElementById("image");
-canvas = <HTMLCanvasElement>document.getElementById("canvas");
-handleEffectImage(canvas, image, { type: TYPE.BLUR });
+handleEffectImage(image, { type: TYPE.BLUR }, ({ imageData, width, height }) => {
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d")?.putImageData(imageData, 0, 0);
+});
 ```
 
 ## Requirement
