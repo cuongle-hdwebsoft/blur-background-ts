@@ -14,7 +14,6 @@ window.onload = async function () {
   blur = blurInput.value;
 
   blurInput.onchange = function (e: any) {
-    console.log(e.target.value);
     blur = e.target.value;
     stopVideo();
     startVideo();
